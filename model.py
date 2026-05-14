@@ -299,7 +299,7 @@ class Transformer(nn.Module):
         self.cfg={'src_vocab_size':src_vocab_size,'tgt_vocab_size':tgt_vocab_size,
                 'd_model':d_model,'N':N,'num_heads':num_heads,'d_ff':d_ff,'dropout':dropout}
         if not os.path.exists(checkpoint_path):
-            gdown.download(id="1dzzw_8xLEmI6i51Jpd0jY5IFIIPXCq5d",output=checkpoint_path,quiet=False)
+            gdown.download(id="1J3PLNYmGF3aapjDA2WlSkqUdDwxFaGtb",output=checkpoint_path,quiet=False)
         ck=torch.load(checkpoint_path,map_location='cpu',weights_only=False)
         self.load_state_dict(ck['model_state_dict'])
 
