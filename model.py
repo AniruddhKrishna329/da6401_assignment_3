@@ -268,6 +268,11 @@ class Transformer(nn.Module):
         super().__init__()
         import spacy
         from datasets import load_dataset
+        import subprocess
+        subprocess.run(["python","-m","spacy","download","de_core_news_sm"])
+        subprocess.run(["python","-m","spacy","download","en_core_web_sm"])
+        self.nlp_de=spacy.load("de_core_news_sm")
+        self.nlp_en=spacy.load("en_core_web_sm")
         self.nlp_de=spacy.load("de_core_news_sm")
         self.nlp_en=spacy.load("en_core_web_sm")
         data=load_dataset("bentrevett/multi30k",split="train")
