@@ -31,48 +31,19 @@ class NoamScheduler(LRScheduler):
         last_epoch       (int)  : The index of the last epoch. Default: -1.
     """
 
-    def __init__(
-        self,
-        optimizer: optim.Optimizer,
-        d_model: int,
-        warmup_steps: int,
-        last_epoch: int = -1,
-    ) -> None:
-        # TODO: Store d_model and warmup_steps as instance attributes
-        # TODO: Call the parent __init__
-        raise NotImplementedError
+    def __init__(self,optimizer,d_model,warmup_steps,last_epoch=-1):
+        self.dm=d_model
+        self.ws=warmup_steps
+        super().__init__(optimizer,last_epoch)
 
     # ------------------------------------------------------------------
-    def _get_lr_scale(self) -> float:
-        """
-        Compute the Noam scaling factor for the current step.
-
-        Returns:
-            float: The scalar multiplier applied to the base learning rate.
-
-        Hint:
-            step = self.last_epoch + 1            # avoid step=0
-            scale = d_model^(-0.5) * min(step^(-0.5), step * warmup_steps^(-1.5))
-        """
-        # TODO: Implement and return the Noam scale factor
-        raise NotImplementedError
+    def _get_lr_scale(self):
+        s=self.last_epoch+1
+        return self.dm**-0.5*min(s**-0.5,s*self.ws**-1.5)
 
     # ------------------------------------------------------------------
-    def get_lr(self) -> list[float]:
-        """
-        Compute learning rates for every param group.
-
-        Called internally by PyTorch's scheduler machinery each step.
-
-        Returns:
-            list[float]: New learning rate for each param group in the optimizer.
-
-        Hint:
-            Multiply each group's `base_lr` by the value from `_get_lr_scale()`.
-            Access base learning rates via `self.base_lrs`.
-        """
-        # TODO: Return a list of scaled LRs, one per param group
-        raise NotImplementedError
+    def get_lr(self):
+        return [b*self._get_lr_scale() for b in self.base_lrs]
 
 
 # ──────────────────────────────────────────────────────────────────────
