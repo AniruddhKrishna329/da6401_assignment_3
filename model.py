@@ -264,7 +264,7 @@ class Transformer(nn.Module):
         dropout        (float): Dropout probability (default 0.1).
     """
 
-    def __init__(self,src_vocab_size,tgt_vocab_size,d_model=512,N=4,num_heads=8,d_ff=2048,dropout=0.1,checkpoint_path=None):
+    def __init__(self,src_vocab_size=18669,tgt_vocab_size=9797,d_model=256,N=4,num_heads=8,d_ff=512,dropout=0.2,checkpoint_path='best.pt'):
         super().__init__()
         import spacy
         from datasets import load_dataset
