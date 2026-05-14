@@ -266,6 +266,22 @@ class Transformer(nn.Module):
 
     def __init__(self,src_vocab_size,tgt_vocab_size,d_model=512,N=4,num_heads=8,d_ff=2048,dropout=0.1,checkpoint_path=None):
         super().__init__()
+        import spacy
+        from datasets import load_dataset
+        self.nlp_de=spacy.load("de_core_news_sm")
+        self.nlp_en=spacy.load("en_core_web_sm")
+        data=load_dataset("bentrevett/multi30k",split="train")
+        specials=['<unk>','<pad>','<sos>','<eos>']
+        vde={t:i for i,t in enumerate(specials)}
+        ven={t:i for i,t in enumerate(specials)}
+        for item in data:
+            for t in [x.text.lower() for x in self.nlp_de.tokenizer(item['de'])]:
+                if t not in vde: vde[t]=len(vde)
+            for t in [x.text.lower() for x in self.nlp_en.tokenizer(item['en'])]:
+                if t not in ven: ven[t]=len(ven)
+        self.vocab_de=vde
+        self.vocab_en=ven
+        self.idx2en={v:k for k,v in ven.items()}
         self.src_emb=nn.Embedding(src_vocab_size,d_model)
         self.tgt_emb=nn.Embedding(tgt_vocab_size,d_model)
         self.pe=PositionalEncoding(d_model,dropout)
@@ -276,10 +292,11 @@ class Transformer(nn.Module):
         self.proj=nn.Linear(d_model,tgt_vocab_size)
         self.scale=math.sqrt(d_model)
         self.cfg={'src_vocab_size':src_vocab_size,'tgt_vocab_size':tgt_vocab_size,
-              'd_model':d_model,'N':N,'num_heads':num_heads,'d_ff':d_ff,'dropout':dropout}
-        if checkpoint_path and os.path.exists(checkpoint_path):
-            ck=torch.load(checkpoint_path,map_location='cpu',weights_only=False)
-            self.load_state_dict(ck['model_state_dict'])
+                'd_model':d_model,'N':N,'num_heads':num_heads,'d_ff':d_ff,'dropout':dropout}
+        if not os.path.exists(checkpoint_path):
+            gdown.download(id="1dzzw_8xLEmI6i51Jpd0jY5IFIIPXCq5d",output=checkpoint_path,quiet=False)
+        ck=torch.load(checkpoint_path,map_location='cpu',weights_only=False)
+        self.load_state_dict(ck['model_state_dict'])
 
     # ── AUTOGRADER HOOKS ── keep these signatures exactly ─────────────
 
